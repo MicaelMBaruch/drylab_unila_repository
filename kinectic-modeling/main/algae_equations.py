@@ -1,14 +1,14 @@
-
-
+import numpy as np
 
 
 class AlgaeEquations():                       
 
     def irradiance_average(self,
-                           irradiance_superficial: float,  # falta
-                           biomass_extintion_coefficient: float,  # falta
-                           microalgae_concentration: float):  # falta
-        pass
+                           microalgae_concentration: float,
+                           irradiance_superfitial: float,
+                           depth: float=1.8,
+                           biomass_extintion_coefficient: float=1):  # falta criei
+        return ((irradiance_superfitial / (biomass_extintion_coefficient * microalgae_concentration * depth)) * (1 - np.exp( - biomass_extintion_coefficient * microalgae_concentration * depth)) )
 
     def algae_mi_irradiance(self,
                             irradiance_average: float,
@@ -35,65 +35,69 @@ class AlgaeEquations():
                              dissolved_o2: float,
                              algae_o2_max: float= 32,
                              form_parameter: float= 4.150):
-        return 1-(dissolved_o2/dissolved_o2*algae_o2_max)**form_parameter
+        if dissolved_o2 != 0:
+            return 1-(dissolved_o2/(dissolved_o2*algae_o2_max))**form_parameter
+        else: 
+            return 1
 
     def algae_mi_dissolvedCO2(self,
                               co2_concentration: float,
-                              bicarbonate_concentration: float,  # falta
+                              bicarbonate_concentration: float,
                               half_saturation_constant: float= 0.004,
                               inhibition_constant: float= 120,
-                              form_parameter: float= float):  # falta
+                              form_parameter: float=1):  # falta criei o valor
         return (co2_concentration + bicarbonate_concentration)/(half_saturation_constant + co2_concentration + bicarbonate_concentration + (co2_concentration**form_parameter)/inhibition_constant)
 
     def algae_mi_nitrate(self,
                          nitrogen_concentration: float,
-                         form_parameter: float,  # falta
+                         form_parameter: float=1,  # falta criei o valor
                          half_saturation_constant: float=2.77,
                          inhibition_constant: float=386.6 ):
         return nitrogen_concentration/(half_saturation_constant + nitrogen_concentration + (nitrogen_concentration**form_parameter)/inhibition_constant)
 
     def algae_mi_amonium(self,
                          nitrogen_concentration: float,
-                         half_saturation_constant: float,  # falta
-                         inhibition_constant: float,  # falta
-                         form_parameter: float):  # falta
+                         half_saturation_constant: float=1.540,
+                         inhibition_constant: float=571,
+                         form_parameter: float=1):  # falta criei
         return nitrogen_concentration/(half_saturation_constant +  nitrogen_concentration + (nitrogen_concentration**form_parameter)/inhibition_constant)
 
     def algae_mi_p(self,
                    phosphate_phosphorum_concentration: float,
-                   half_saturation_constant: float):  # falta
+                   half_saturation_constant: float=0.430):
         return phosphate_phosphorum_concentration/(phosphate_phosphorum_concentration+half_saturation_constant)
 
     def algae_manutention(self,
-                          algae_respiration_min: float,
-                          algae_respiration_max: float,  # falta
-                          irradiance_average: float,  # falta
-                          irradiance_required: float,  # falta
-                          form_parameter_resp: float):  # falta
+                          irradiance_average: float,
+                          algae_respiration_min: float=0.01,
+                          algae_respiration_max: float=0.267,
+                          irradiance_required: float=134,
+                          form_parameter_resp: float=1.4):
         return algae_respiration_min + (algae_respiration_max*irradiance_average ** form_parameter_resp/(irradiance_required ** form_parameter_resp + irradiance_average ** form_parameter_resp))
 
     def algae_mi(self,
                  algae_mi_irradiance: float,
-                 algae_mi_temperature: float,  # falta
-                 algae_mi_ph: float,  # falta
-                 algae_mi_dissolvedO2: float,  # falta
-                 algae_mi_dissolvedCO2: float,  # falta
-                 algae_mi_nitrogen: float,  # falta
-                 algae_mi_p: float,  # falta
-                 algae_manutention: float):  # falta
+                 algae_mi_temperature: float,  
+                 algae_mi_ph: float,  
+                 algae_mi_dissolvedO2: float,  
+                 algae_mi_dissolvedCO2: float, 
+                 algae_mi_nitrogen: float,  
+                 algae_mi_p: float,  
+                 algae_manutention: float):
         return (algae_mi_irradiance * algae_mi_temperature * algae_mi_ph * algae_mi_dissolvedO2 * algae_mi_dissolvedCO2 * algae_mi_nitrogen * algae_mi_p) - algae_manutention
 
     def calculate_mi(self,
-                     irradiance_superfitial: float,  # falta
-                     temperature: float,  # falta
-                     medium_ph: float,  # falta
-                     dissolved_o2: float,  # falta
-                     co2_concentration: float,  # falta
-                     bicarbonate_concentration: float,  # falta
-                     nitrogen_concentration: float,  # falta
-                     amonium_concentration: float,  # falta
-                     phosphate_phosphorum_concentration: float):  # falta
-        irradiance_average = irradiance_average(irradiance_superfitial)
+                     algae_concentration,
+                     irradiance_superfitial: float,
+                     temperature: float,
+                     medium_ph: float,
+                     dissolved_o2: float,
+                     co2_concentration: float,
+                     bicarbonate_concentration: float,
+                     nitrogen_concentration: float,
+                     amonium_concentration: float,
+                     phosphate_phosphorum_concentration: float):
+        irradiance_average = self.irradiance_average(algae_concentration, irradiance_superfitial)
         mi_irradiance = self.algae_mi_irradiance(irradiance_average)
         mi_temperature = self.algae_mi_temperature(temperature)
         mi_ph = self.algae_mi_ph(medium_ph)
@@ -104,11 +108,13 @@ class AlgaeEquations():
         mi_phosphate = self.algae_mi_p(phosphate_phosphorum_concentration)
         manutention_expense = self.algae_manutention(irradiance_average)
         
-        return self.algae_mi(mi_irradiance,
-                             mi_temperature,
-                             mi_ph,
-                             mi_dissolved_o2,
-                             mi_dissolved_co2,
-                             mi_nitrogen,
-                             mi_phosphate,
-                             manutention_expense) 
+        return self.algae_mi(
+            mi_irradiance,
+            mi_temperature,
+            mi_ph,
+            mi_dissolved_o2,
+            mi_dissolved_co2,
+            mi_nitrogen,
+            mi_phosphate,
+            manutention_expense
+            ) 

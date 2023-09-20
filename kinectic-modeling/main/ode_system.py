@@ -3,7 +3,31 @@ from algae_equations import AlgaeEquations
 
 
 class ODESystem():
-    def __init__(
+    def ode_system(self, t, y) -> list:
+        algae_concentration, petase_concentration, mhetase_concentration, pet_concentration, mhet_concentration, irradiance_superfitial, temperature, medium_ph, dissolved_o2, co2_concentration, bicarbonate_concentration, nitrogen_concentration, amonium_concentration, phosphate_phosphorum_concentration = y
+        algae_equations = AlgaeEquations()
+        mi = algae_equations.calculate_mi(algae_concentration,
+                                         irradiance_superfitial,
+                                         temperature,
+                                         medium_ph,
+                                         dissolved_o2,
+                                         co2_concentration,
+                                         bicarbonate_concentration,
+                                         nitrogen_concentration,
+                                         amonium_concentration,
+                                         phosphate_phosphorum_concentration)
+        enzyme_equations = EnzymeEquations()
+        algae_concentration = algae_concentration * mi
+        petase_concentration = enzyme_equations.enzyme_concentration(algae_concentration, petase_concentration)
+        mhetase_concentration = enzyme_equations.enzyme_concentration(algae_concentration, petase_concentration)
+        pet_concentration = pet_concentration - 0.0335 * petase_concentration  # criei (tirei do popo pra ser mais exato)
+        mhet_concentration = mhet_concentration - enzyme_equations.degradation_rate(
+            mhetase_concentration,
+            mhet_concentration,
+            substrate_degradation_rate=21600,
+            enzyme_substrate_affinity_constant=23.17)
+
+        return [
             algae_concentration,
             petase_concentration,
             mhetase_concentration,
@@ -17,19 +41,5 @@ class ODESystem():
             bicarbonate_concentration,
             nitrogen_concentration,
             amonium_concentration,
-            phosphate_phosphorum_concentration) -> list:
-        mi = AlgaeEquations.calculate_mi(irradiance_superfitial,
-                                         temperature,
-                                         medium_ph,
-                                         dissolved_o2,
-                                         co2_concentration,
-                                         bicarbonate_concentration,
-                                         nitrogen_concentration,
-                                         amonium_concentration,
-                                         phosphate_phosphorum_concentration)
-        dalgae_dt = algae_concentration * mi
-        dpetase_mhetase_dt = EnzymeEquations.enzyme_concentration(algae_concentration)
-        dpet_dt = pet_concentration - EnzymeEquations.degradation_rate(petase_concentration, pet_concentration)
-        dmhet_dt = mhet_concentration - EnzymeEquations.degradation_rate(mhetase_concentration, mhet_concentration)
-
-        return [dalgae_dt, dpetase_mhetase_dt, dpet_dt, dmhet_dt]
+            phosphate_phosphorum_concentration
+            ]
