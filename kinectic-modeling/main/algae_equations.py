@@ -7,7 +7,7 @@ class AlgaeEquations():
             self,
             microalgae_concentration: float,
             irradiance_superfitial: float,
-            depth: float=1.8,
+            depth: float=1.8,  # m
             biomass_extintion_coefficient: float=1  # falta criei
             ) -> float:
         return ((irradiance_superfitial / (biomass_extintion_coefficient * microalgae_concentration * depth)) * (1 - np.exp( - biomass_extintion_coefficient * microalgae_concentration * depth)) )
@@ -93,7 +93,7 @@ class AlgaeEquations():
             irradiance_required: float=134,
             form_parameter_resp: float=1.4
             ) -> float:
-        return algae_respiration_min + (algae_respiration_max*irradiance_average ** form_parameter_resp/(irradiance_required ** form_parameter_resp + irradiance_average ** form_parameter_resp))
+        return algae_respiration_min + (algae_respiration_max * irradiance_average ** form_parameter_resp/(irradiance_required ** form_parameter_resp + irradiance_average ** form_parameter_resp))
 
     def algae_mi(
             self,

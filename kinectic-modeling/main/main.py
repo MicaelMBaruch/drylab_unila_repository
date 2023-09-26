@@ -25,6 +25,7 @@ medium_ph = 7  # pH
 dissolved_o2 = 0
 bicarbonate_concentration = 288
 co2_concentration = 3000000  # falta, inventei valor super alto para que seja irrelevante
+volume = 3 #mcubico
 
 #putting it all togheter
 petase_concentration, mhetase_concentration = [0,0]
@@ -41,12 +42,13 @@ scenario = [algae_initial_concentration,
             bicarbonate_concentration,
             nitrate_concentration,
             amonium_concentration,
-            phosphate_phosphorum_concentration]
+            phosphate_phosphorum_concentration,
+            volume]
 
 ###Results
 ode_system = ODESystem()
 results = solve_ivp(ode_system.ode_system, (4.2, 0), scenario)
-algae_concentration, petase_concentration, mhetase_concentration, pet_concentration, mhet_concentration, irradiance_superfitial, temperature, medium_ph, dissolved_o2, co2_concentration, bicarbonate_concentration, nitrogen_concentration, amonium_concentration, phosphate_phosphorum_concentration = results.y
+algae_concentration, petase_concentration, mhetase_concentration, pet_concentration, mhet_concentration, irradiance_superfitial, temperature, medium_ph, dissolved_o2, co2_concentration, bicarbonate_concentration, nitrogen_concentration, amonium_concentration, phosphate_phosphorum_concentration, volume = results.y
 print(f'algae concentration: {algae_concentration}\n -----------\n petase concentration: {petase_concentration}\n ---------\npet concentration: {pet_concentration}\n ---------')
 ###ploting the results
 plt.figure(figsize=(10, 6))
