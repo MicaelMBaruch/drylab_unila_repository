@@ -28,7 +28,7 @@ class AlgaeEquations():
             algae_temperature_min: float =3.4,  
             algae_temperature_optimal: float=30
             ) -> float:  
-        return ((temperature - algae_temperature_max)*(temperature - algae_temperature_min)**2)/(algae_temperature_optimal - algae_temperature_min) * (((algae_temperature_optimal - algae_temperature_min)* temperature - algae_temperature_optimal) - ((algae_temperature_optimal-algae_temperature_max)* (algae_temperature_optimal + algae_temperature_min -2*temperature)))
+        return ((temperature - algae_temperature_max)*(temperature - algae_temperature_min)**2)/((algae_temperature_optimal - algae_temperature_min) * (((algae_temperature_optimal - algae_temperature_min)* temperature - algae_temperature_optimal) - ((algae_temperature_optimal-algae_temperature_max)* (algae_temperature_optimal + algae_temperature_min -2*temperature))))
 
     def algae_mi_ph(
             self,
@@ -37,7 +37,7 @@ class AlgaeEquations():
             algae_ph_min: float=1.8,
             algae_ph_optimal: float=8.5
             ) -> float:
-        return ((medium_ph - algae_ph_max)*(medium_ph- algae_ph_min)**2)/(algae_ph_optimal - algae_ph_min) * (((algae_ph_optimal - algae_ph_min)* medium_ph- algae_ph_optimal) - ((algae_ph_optimal-algae_ph_max)* (algae_ph_optimal + algae_ph_min -2*medium_ph)))
+        return ((medium_ph - algae_ph_max)*(medium_ph- algae_ph_min)**2)/((algae_ph_optimal - algae_ph_min) * (((algae_ph_optimal - algae_ph_min)* (medium_ph- algae_ph_optimal) - ((algae_ph_optimal-algae_ph_max) * (algae_ph_optimal + algae_ph_min -2*medium_ph)))))
 
     def algae_mi_dissolvedO2(
             self,
@@ -54,8 +54,8 @@ class AlgaeEquations():
             self,
             co2_concentration: float,
             bicarbonate_concentration: float,
-            half_saturation_constant: float= 0.004,
-            inhibition_constant: float= 120,
+            half_saturation_constant: float= 4,
+            inhibition_constant: float= 120000,
             form_parameter: float=1  # falta criei o valor
             ) -> float:
         return (co2_concentration + bicarbonate_concentration)/(half_saturation_constant + co2_concentration + bicarbonate_concentration + (co2_concentration**form_parameter)/inhibition_constant)
@@ -64,26 +64,26 @@ class AlgaeEquations():
             self,
             nitrogen_concentration: float,
             form_parameter: float=1,  # falta criei o valor
-            half_saturation_constant: float=2.77,
-            inhibition_constant: float=386.6 
+            half_saturation_constant: float=2770,
+            inhibition_constant: float=386600 
             ) -> float:
         return nitrogen_concentration/(half_saturation_constant + nitrogen_concentration + (nitrogen_concentration**form_parameter)/inhibition_constant)
 
     def algae_mi_amonium(
             self,
             nitrogen_concentration: float,
-            half_saturation_constant: float=1.540,
-            inhibition_constant: float=571,
+            half_saturation_constant: float=1540,
+            inhibition_constant: float=571000,
             form_parameter: float=1  # falta criei
             ) -> float:
-        return nitrogen_concentration/(half_saturation_constant +  nitrogen_concentration + (nitrogen_concentration**form_parameter)/inhibition_constant)
+        return nitrogen_concentration/(half_saturation_constant +  nitrogen_concentration + (nitrogen_concentration ** form_parameter) / inhibition_constant)
 
     def algae_mi_p(
             self,
             phosphate_phosphorum_concentration: float,
-            half_saturation_constant: float=0.430
+            half_saturation_constant: float=430
             ) -> float:
-        return phosphate_phosphorum_concentration/(phosphate_phosphorum_concentration+half_saturation_constant)
+        return phosphate_phosphorum_concentration / (phosphate_phosphorum_concentration + half_saturation_constant)
 
     def algae_manutention(
             self,
@@ -106,8 +106,7 @@ class AlgaeEquations():
             algae_mi_p: float,  
             algae_manutention: float
             ):
-        return (algae_mi_irradiance * algae_mi_temperature * algae_mi_ph * algae_mi_dissolvedO2 * algae_mi_dissolvedCO2 * algae_mi_nitrogen * algae_mi_p) - algae_manutention
-
+        return (algae_mi_irradiance * algae_mi_temperature * algae_mi_ph * algae_mi_dissolvedO2 * algae_mi_dissolvedCO2 * algae_mi_nitrogen * algae_mi_p)
     def calculate_mi(
             self,
             algae_concentration,
@@ -131,7 +130,7 @@ class AlgaeEquations():
         else: mi_nitrogen = self.algae_mi_amonium(amonium_concentration)
         mi_phosphate = self.algae_mi_p(phosphate_phosphorum_concentration)
         manutention_expense = self.algae_manutention(irradiance_average)
-        
+
         return self.algae_mi(
             mi_irradiance,
             mi_temperature,
