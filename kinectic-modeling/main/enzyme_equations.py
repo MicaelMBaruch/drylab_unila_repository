@@ -14,7 +14,7 @@ class EnzymeEquations():
             expression_rate: float=1,  # falta (criei)
             secretion_rate: float=1  # falta  (criei)
             ) -> float:
-        return algae_concentration * expression_rate * secretion_rate * 0.006  # falta (criei da minha cabeuça)
+        return algae_concentration * expression_rate * secretion_rate  # falta (criei da minha cabeuça)
 
     def pet_degradation_rate(
             self,

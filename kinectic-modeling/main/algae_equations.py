@@ -7,8 +7,8 @@ class AlgaeEquations():
             self,
             microalgae_concentration: float,
             irradiance_superfitial: float,
-            depth: float=1.8,  # m
-            biomass_extintion_coefficient: float=1  # falta criei
+            depth: float=0.1,  # m
+            biomass_extintion_coefficient: float=0.000007  # m2/mg
             ) -> float:
         return ((irradiance_superfitial / (biomass_extintion_coefficient * microalgae_concentration * depth)) * (1 - np.exp( - biomass_extintion_coefficient * microalgae_concentration * depth)) )
 
@@ -106,7 +106,7 @@ class AlgaeEquations():
             algae_mi_p: float,  
             algae_manutention: float
             ):
-        return (algae_mi_irradiance * algae_mi_temperature * algae_mi_ph * algae_mi_dissolvedO2 * algae_mi_dissolvedCO2 * algae_mi_nitrogen * algae_mi_p)
+        return (algae_mi_irradiance * algae_mi_temperature * algae_mi_ph * algae_mi_dissolvedO2 * algae_mi_dissolvedCO2 * algae_mi_nitrogen * algae_mi_p) - algae_manutention
     def calculate_mi(
             self,
             algae_concentration,
