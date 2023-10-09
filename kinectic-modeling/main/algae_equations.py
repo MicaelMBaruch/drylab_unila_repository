@@ -7,7 +7,7 @@ class AlgaeEquations():
             self,
             microalgae_concentration: float,
             irradiance_superfitial: float,
-            depth: float=0.1,  # m
+            depth: float=1.8,  # m
             biomass_extintion_coefficient: float=0.000007  # m2/mg
             ) -> float:
         return ((irradiance_superfitial / (biomass_extintion_coefficient * microalgae_concentration * depth)) * (1 - np.exp( - biomass_extintion_coefficient * microalgae_concentration * depth)) )
