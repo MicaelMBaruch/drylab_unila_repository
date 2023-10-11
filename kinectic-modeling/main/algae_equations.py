@@ -15,7 +15,7 @@ class AlgaeEquations():
     def mi_irradiance(
             self,
             irradiance_average: float,
-            mi_max: float=38.184,
+            mi_max: float=1.591,
             irradiance_constant: float=168,
             form_parameter: float=1.7
             ) -> float:
