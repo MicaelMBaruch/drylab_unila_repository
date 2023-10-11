@@ -4,6 +4,7 @@ import numpy as np
 class AlgaeEquations():                       
     def __init__(self, initial_concentration):
         self.initial_concentration = initial_concentration
+        self.current_concentration = initial_concentration
 
     def irradiance_average(
             self,
