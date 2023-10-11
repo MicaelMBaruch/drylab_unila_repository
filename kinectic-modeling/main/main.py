@@ -3,71 +3,52 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 from ode_system import ODESystem
+from algae_equations import AlgaeEquations
+from het_bacteria_equations import HeteroTrophBac
+from nit_bacteria_equations import NitrifyingBac
+from dissolved_co2 import DissolvedCO2
+from bsom import BSOM
+from amonium_nitrogen import AmoniumNitrogen
+from nitrate_nitrogen import NitrateNitrogen
+from phosphate_phosphorum import PhosphatePhosphorous
+from enzyme_equations import EnzymeEquations
 
-
-# Defining a scenario
-
-# Duration
-hidraulic_retention_period_days = 4
-time = np.arange(0, hidraulic_retention_period_days, 0.6)
-
-# algae
-algae_initial_concentration = 10
-
-# substrate
-pet_initial_concentration = 10
-mhet_initial_concentration = 0
+#  Defining a scenario
+# organisms
+algae = AlgaeEquations(0.003322 * 10^(-4))
+het_bac = HeteroTrophBac()
+nit_bac = NitrifyingBac()
 
 # nutrients
-amonium_concentration = 30900
-nitrate_concentration = 400
-phosphate_phosphorum_concentration = 119200
+co2 = DissolvedCO2()
+bsom = BSOM()
+amonium_nitrogen = AmoniumNitrogen()
+nitrate_nitrogen = NitrateNitrogen()
+phosphate_phosphorous = PhosphatePhosphorous()
 
-# enviroment
-irradiance_superfitial = [134, 134, 134, 134, 134, 134, 134, 134]  # Ainda precisa ser definido, em miE/m2
-temperature = [30, 28, 25, 26, 27, 28, 29, 30]   # graus celsius
-medium_ph = 7.8  # pH
-dissolved_o2 = 0
-bicarbonate_concentration = 288
-co2_concentration = 3000000  # falta, inventei valor super alto para que seja irrelevante
+# enviromental conditions
+o2 = 125
+av_temperature = 32
+pH = 7.8
+superficial_irradiance = 934
 
-# putting it all togheter
-petase_concentration, mhetase_concentration = [0,0]
-dependents = [
-    algae_initial_concentration,
-    petase_concentration,
-    mhetase_concentration,
-    pet_initial_concentration,
-    mhet_initial_concentration,
-    ]
-variable_independents = [
-    irradiance_superfitial,
-    temperature,
-    ]
-fixed_independents = [
-    medium_ph,
-    dissolved_o2,
-    co2_concentration,
-    bicarbonate_concentration,
-    nitrate_concentration,
-    amonium_concentration,
-    phosphate_phosphorum_concentration,
-    ]
+# enzymes
+pet_mhetase = EnzymeEquations()
 
-### Results
-ode_system = ODESystem()
+# equation system
+co2.dissolved_hco3()
+co2.dissolved_co2()
+bsom.bsom_concentration()
+amonium_nitrogen.amonium_nitrogen_concentration()
+nitrate_nitrogen.nitrate_nitrogen_concentration()
+phosphate_phosphorous.concentration()
 
-results = solve_ivp(ode_system.ode_system, t_span=(0,hidraulic_retention_period_days), t_eval=time, y0=dependents, args=[variable_independents, fixed_independents], options={'first_step':0.6})
-algae_concentration, petase_concentration, mhetase_concentration, pet_concentration, mhet_concentration = results.y
-print(f'algae concentration: {algae_concentration}\n -----------\n petase concentration: {petase_concentration}\n ---------\npet concentration: {pet_concentration}\n ---------')
+algae_mi = algae.calculate_mi()
+het_mi = het_bac = het_bac.mi()
+nit_mi = nit_bac = nit_bac.mi()
+algae.current_concentration = algae_mi * algae.current_concentration
+het_bac.current_concentration = het_mi * het_bac.current_concentration
+nit_bac.current_concentration = nit_mi * nit_bac.current_concentration
 
-### ploting the results
-plt.figure(figsize=(10, 6))
-plt.plot(time, algae_concentration, label='Algae Concentration')
-plt.plot(time, pet_concentration, label='PET Concentration')
-plt.plot(time, mhet_concentration, label='MHET Concentration')
-plt.xlabel('Time')
-plt.ylabel('Concentration')
-plt.legend()
-plt.title('Microalgae and PET/MHET Concentrations Over Time')
-plt.show()
+# duration
+time_array = np.arange(0, 21, 1)

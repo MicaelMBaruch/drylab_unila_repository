@@ -2,6 +2,9 @@ import numpy as np
 
 
 class AlgaeEquations():                       
+    def __init__(self, initial_concentration):
+        self.initial_concentration = initial_concentration
+        self.current_concentration = initial_concentration
 
     def irradiance_average(
             self,
@@ -56,9 +59,8 @@ class AlgaeEquations():
             bicarbonate_concentration: float,
             half_saturation_constant: float= 4,
             inhibition_constant: float= 120000,
-            form_parameter: float=1  # falta criei o valor
             ) -> float:
-        return (co2_concentration + bicarbonate_concentration)/(half_saturation_constant + co2_concentration + bicarbonate_concentration + (co2_concentration**form_parameter)/inhibition_constant)
+        return (co2_concentration + bicarbonate_concentration)/(half_saturation_constant + co2_concentration + bicarbonate_concentration + (co2_concentration**2)/inhibition_constant)
 
     def mi_nitrate(
             self,
@@ -88,8 +90,8 @@ class AlgaeEquations():
     def manutention(
             self,
             irradiance_average: float,
-            respiration_min: float=0.01,
-            respiration_max: float=0.267,
+            respiration_max: float=0.01,
+            respiration_min: float=0.267,
             irradiance_required: float=134,
             form_parameter_resp: float=1.4
             ) -> float:

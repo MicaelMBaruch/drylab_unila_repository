@@ -1,6 +1,8 @@
 class NitrifyingBac:
-    def __init__(self):
+    def __init__(self, initial_concentration):
         self.mi_max = 0.730
+        self.initial_concentration = initial_concentration
+        self.current_concentration = initial_concentration
 
     def mi(
         self,

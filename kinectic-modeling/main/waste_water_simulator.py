@@ -26,7 +26,7 @@ class WasteWaterSimulator():
         previous_concentration = 0
         enzyme_concentrations_list = []
         for day, algae_concentration in enumerate(self.Cx_list):
-            current_concentration = algae_concentration * self.enzyme_production(day) + previous_concentration * 0.7
+            current_concentration = algae_concentration * 75 + previous_concentration * 0.7
             previous_concentration = current_concentration
             enzyme_concentrations_list.append(current_concentration)
         return enzyme_concentrations_list

@@ -1,8 +1,10 @@
 class HeteroTrophBac:
-    def __intit__(self):
+    def __intit__(self, initial_concentration):
         self.mi_max = 1.235
+        self.initial_concentration = initial_concentration
+        self.current_concentration = initial_concentration
 
-    def final_mi(
+    def mi(
             self,
             mi_temperature: float,  
             mi_ph: float,  
