@@ -12,7 +12,7 @@ class AlgaeEquations():
             ) -> float:
         return ((irradiance_superfitial / (biomass_extintion_coefficient * microalgae_concentration * depth)) * (1 - np.exp( - biomass_extintion_coefficient * microalgae_concentration * depth)) )
 
-    def algae_mi_irradiance(
+    def mi_irradiance(
             self,
             irradiance_average: float,
             mi_max: float=38.184,
@@ -21,36 +21,36 @@ class AlgaeEquations():
             ) -> float:
         return mi_max * irradiance_average ** form_parameter/(irradiance_constant**form_parameter + irradiance_average**form_parameter)
 
-    def algae_mi_temperature(
+    def mi_temperature(
             self,
             temperature: float,
-            algae_temperature_max: float=12.9,  
-            algae_temperature_min: float =3.4,  
-            algae_temperature_optimal: float=30
+            temperature_max: float=12.9,  
+            temperature_min: float =3.4,  
+            temperature_optimal: float=30
             ) -> float:  
-        return ((temperature - algae_temperature_max)*(temperature - algae_temperature_min)**2)/((algae_temperature_optimal - algae_temperature_min) * (((algae_temperature_optimal - algae_temperature_min)* temperature - algae_temperature_optimal) - ((algae_temperature_optimal-algae_temperature_max)* (algae_temperature_optimal + algae_temperature_min -2*temperature))))
+        return ((temperature - temperature_max)*(temperature - temperature_min)**2)/((temperature_optimal - temperature_min) * (((temperature_optimal - temperature_min)* temperature - temperature_optimal) - ((temperature_optimal-temperature_max)* (temperature_optimal + temperature_min -2*temperature))))
 
-    def algae_mi_ph(
+    def mi_ph(
             self,
             medium_ph: float,
-            algae_ph_max: float=12.9,
-            algae_ph_min: float=1.8,
-            algae_ph_optimal: float=8.5
+            ph_max: float=12.9,
+            ph_min: float=1.8,
+            ph_optimal: float=8.5
             ) -> float:
-        return ((medium_ph - algae_ph_max)*(medium_ph- algae_ph_min)**2)/((algae_ph_optimal - algae_ph_min) * (((algae_ph_optimal - algae_ph_min)* (medium_ph- algae_ph_optimal) - ((algae_ph_optimal-algae_ph_max) * (algae_ph_optimal + algae_ph_min -2*medium_ph)))))
+        return ((medium_ph - ph_max)*(medium_ph- ph_min)**2)/((ph_optimal - ph_min) * (((ph_optimal - ph_min)* (medium_ph- ph_optimal) - ((ph_optimal-ph_max) * (ph_optimal + ph_min -2*medium_ph)))))
 
-    def algae_mi_dissolvedO2(
+    def mi_dissolvedO2(
             self,
             dissolved_o2: float,
-            algae_o2_max: float= 32,
+            o2_max: float= 32,
             form_parameter: float= 4.150
             ) -> float:
         if dissolved_o2 != 0:
-            return 1-(dissolved_o2/(dissolved_o2*algae_o2_max))**form_parameter
+            return 1-(dissolved_o2/(dissolved_o2*o2_max))**form_parameter
         else: 
             return 1
 
-    def algae_mi_dissolvedCO2(
+    def mi_dissolvedCO2(
             self,
             co2_concentration: float,
             bicarbonate_concentration: float,
@@ -60,7 +60,7 @@ class AlgaeEquations():
             ) -> float:
         return (co2_concentration + bicarbonate_concentration)/(half_saturation_constant + co2_concentration + bicarbonate_concentration + (co2_concentration**form_parameter)/inhibition_constant)
 
-    def algae_mi_nitrate(
+    def mi_nitrate(
             self,
             nitrogen_concentration: float,
             form_parameter: float=1,  # falta criei o valor
@@ -69,7 +69,7 @@ class AlgaeEquations():
             ) -> float:
         return nitrogen_concentration/(half_saturation_constant + nitrogen_concentration + (nitrogen_concentration**form_parameter)/inhibition_constant)
 
-    def algae_mi_amonium(
+    def mi_amonium(
             self,
             nitrogen_concentration: float,
             half_saturation_constant: float=1540,
@@ -78,38 +78,39 @@ class AlgaeEquations():
             ) -> float:
         return nitrogen_concentration/(half_saturation_constant +  nitrogen_concentration + (nitrogen_concentration ** form_parameter) / inhibition_constant)
 
-    def algae_mi_p(
+    def mi_p(
             self,
             phosphate_phosphorum_concentration: float,
             half_saturation_constant: float=430
             ) -> float:
         return phosphate_phosphorum_concentration / (phosphate_phosphorum_concentration + half_saturation_constant)
 
-    def algae_manutention(
+    def manutention(
             self,
             irradiance_average: float,
-            algae_respiration_min: float=0.01,
-            algae_respiration_max: float=0.267,
+            respiration_min: float=0.01,
+            respiration_max: float=0.267,
             irradiance_required: float=134,
             form_parameter_resp: float=1.4
             ) -> float:
-        return algae_respiration_min + (algae_respiration_max * irradiance_average ** form_parameter_resp/(irradiance_required ** form_parameter_resp + irradiance_average ** form_parameter_resp))
+        return respiration_min + (respiration_max * irradiance_average ** form_parameter_resp/(irradiance_required ** form_parameter_resp + irradiance_average ** form_parameter_resp))
 
-    def algae_mi(
+    def mi(
             self,
-            algae_mi_irradiance: float,
-            algae_mi_temperature: float,  
-            algae_mi_ph: float,  
-            algae_mi_dissolvedO2: float,  
-            algae_mi_dissolvedCO2: float, 
-            algae_mi_nitrogen: float,  
-            algae_mi_p: float,  
-            algae_manutention: float
+            mi_irradiance: float,
+            mi_temperature: float,  
+            mi_ph: float,  
+            mi_dissolvedO2: float,  
+            mi_dissolvedCO2: float, 
+            mi_nitrogen: float,  
+            mi_p: float,  
+            manutention: float
             ):
-        return (algae_mi_irradiance * algae_mi_temperature * algae_mi_ph * algae_mi_dissolvedO2 * algae_mi_dissolvedCO2 * algae_mi_nitrogen * algae_mi_p) - algae_manutention
+        return (mi_irradiance * mi_temperature * mi_ph * mi_dissolvedO2 * mi_dissolvedCO2 * mi_nitrogen * mi_p) - manutention
+
     def calculate_mi(
             self,
-            algae_concentration,
+            concentration,
             irradiance_superfitial: float,
             temperature: float,
             medium_ph: float,
@@ -120,18 +121,18 @@ class AlgaeEquations():
             amonium_concentration: float,
             phosphate_phosphorum_concentration: float
             ) -> float:
-        irradiance_average = self.irradiance_average(algae_concentration, irradiance_superfitial)
-        mi_irradiance = self.algae_mi_irradiance(irradiance_average)
-        mi_temperature = self.algae_mi_temperature(temperature)
-        mi_ph = self.algae_mi_ph(medium_ph)
-        mi_dissolved_o2 = self.algae_mi_dissolvedO2(dissolved_o2)
-        mi_dissolved_co2 = self.algae_mi_dissolvedCO2(co2_concentration, bicarbonate_concentration)
-        if nitrogen_concentration > 0: mi_nitrogen =  self.algae_mi_nitrate(nitrogen_concentration) 
-        else: mi_nitrogen = self.algae_mi_amonium(amonium_concentration)
-        mi_phosphate = self.algae_mi_p(phosphate_phosphorum_concentration)
-        manutention_expense = self.algae_manutention(irradiance_average)
+        irradiance_average = self.irradiance_average(concentration, irradiance_superfitial)
+        mi_irradiance = self.mi_irradiance(irradiance_average)
+        mi_temperature = self.mi_temperature(temperature)
+        mi_ph = self.mi_ph(medium_ph)
+        mi_dissolved_o2 = self.mi_dissolvedO2(dissolved_o2)
+        mi_dissolved_co2 = self.mi_dissolvedCO2(co2_concentration, bicarbonate_concentration)
+        if nitrogen_concentration > 0: mi_nitrogen =  self.mi_nitrate(nitrogen_concentration) 
+        else: mi_nitrogen = self.mi_amonium(amonium_concentration)
+        mi_phosphate = self.mi_p(phosphate_phosphorum_concentration)
+        manutention_expense = self.manutention(irradiance_average)
 
-        return self.algae_mi(
+        return self.mi(
             mi_irradiance,
             mi_temperature,
             mi_ph,

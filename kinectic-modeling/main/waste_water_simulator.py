@@ -25,8 +25,8 @@ class WasteWaterSimulator():
     def enzyme_concentration(self):
         previous_concentration = 0
         enzyme_concentrations_list = []
-        for algae_concentration in self.Cx_list:
-            current_concentration = algae_concentration * 75 + previous_concentration * 0.7
+        for day, algae_concentration in enumerate(self.Cx_list):
+            current_concentration = algae_concentration * self.enzyme_production(day) + previous_concentration * 0.7
             previous_concentration = current_concentration
             enzyme_concentrations_list.append(current_concentration)
         return enzyme_concentrations_list
@@ -51,12 +51,19 @@ class WasteWaterSimulator():
         self.pet_concentration = pd.DataFrame([self.cpet, self.time_array])
         self.enzyme_concentration = pd.DataFrame([self.Cenz, self.time_array])
 
-    def enzyme_production(self):  # doi/epdf/10.1038/msb.2013.14
+    def get_enzyme_production_list(self):  # doi/epdf/10.1038/msb.2013.14
         Vmaxtx = 0.2 # ng/dia https://doi.org/10.1016/j.algal.2013.09.002
         Km = self.mi_max/2  # estimated
+        enzyme_production_list = []
         for day in self.time_array:
             k = (Vmaxtx * (self.mi_variation(day)/ Km) )/ ((1 + ((self.mi_variation(day)/ Km))))
-        return k
+            enzyme_production_list.append(k)
+        return enzyme_production_list
+
+    def enzyme_production(self, day):
+        Vmaxtx = 0.2 # ng/dia https://doi.org/10.1016/j.algal.2013.09.002
+        Km = self.mi_max/2  # estimated
+        return (Vmaxtx * (self.mi_variation(day)/ Km) )/ ((1 + ((self.mi_variation(day)/ Km))))
 
     def plot_algae(self, title):
         plt.plot(self.time_array, self.Cx_list, label='C. reinhardtii Concentration', c='green', marker='o')
